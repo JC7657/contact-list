@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
 import PropTypes from "prop-types";
 
-class AddContact extends React.Component {
+class EditContact extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -13,7 +13,7 @@ class AddContact extends React.Component {
 			address: ""
 		};
 		this.handleChange = this.handleChange.bind(this);
-		this.addContact = this.addContact.bind(this);
+		this.EditContact = this.EditContact.bind(this);
 		this.goBack = this.goBack.bind(this);
 	}
 
@@ -24,13 +24,29 @@ class AddContact extends React.Component {
 			[e.target.name]: e.target.value
 		});
 	}
-	addContact() {
+	EditContact() {
 		const { actions } = this.context;
-		actions.setNewContact(this.state.full_name, this.state.email, this.state.phone, this.state.address);
+		actions.editContact(
+			this.state.full_name,
+			this.state.email,
+			this.state.phone,
+			this.state.address,
+			window.location.pathname.split("/")[3]
+		);
 	}
 	componentDidMount() {
 		const { actions } = this.context;
 		actions.saveCurrentAgenda();
+		fetch("https://assets.breatheco.de/apis/fake/contact/" + window.location.pathname.split("/")[3])
+			.then(resp => resp.json())
+			.then(data => {
+				this.setState({
+					full_name: data.full_name,
+					email: data.email,
+					phone: data.phone,
+					address: data.address
+				});
+			});
 	}
 	goBack() {
 		const { store } = this.context;
@@ -52,6 +68,7 @@ class AddContact extends React.Component {
 								type="text"
 								className="form-control"
 								placeholder="Full Name"
+								value={this.state.full_name}
 							/>
 						</div>
 						<div className="form-group">
@@ -62,6 +79,7 @@ class AddContact extends React.Component {
 								type="email"
 								className="form-control"
 								placeholder="Enter email"
+								value={this.state.email}
 							/>
 						</div>
 						<div className="form-group">
@@ -72,6 +90,7 @@ class AddContact extends React.Component {
 								type="phone"
 								className="form-control"
 								placeholder="Enter phone"
+								value={this.state.phone}
 							/>
 						</div>
 						<div className="form-group">
@@ -82,9 +101,10 @@ class AddContact extends React.Component {
 								type="text"
 								className="form-control"
 								placeholder="Enter address"
+								value={this.state.address}
 							/>
 						</div>
-						<button onClick={this.addContact} type="button" className="btn btn-primary form-control">
+						<button onClick={this.EditContact} type="button" className="btn btn-primary form-control">
 							save
 						</button>
 						<span onClick={this.goBack} className="mt-3 w-100 text-center">
@@ -97,7 +117,7 @@ class AddContact extends React.Component {
 	}
 }
 
-export default AddContact;
-AddContact.propTypes = {
+export default EditContact;
+EditContact.propTypes = {
 	history: PropTypes.any
 };
